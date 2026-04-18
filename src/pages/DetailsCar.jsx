@@ -1,63 +1,47 @@
 import { DetailsCarCharacter } from "../components/deatilscar/Character";
 import { Users, Settings, Settings2, LayoutGrid } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { Stepper } from "../components/Stepper";
 
 export function DetailsCar() {
 
     const characters = [
-        {
-            icon: <Users />,
-            name: "Asientos",
-            value: "5"
-        },
-        {
-            icon: <Settings />,
-            name: "Transmisión",
-            value: "Automatico"
-        },
-        {
-            icon: <Settings2 />,
-            name: "Combustible",
-            value: "Gasolina"
-        },
-        {
-            icon: <LayoutGrid />,
-            name: "Tipo",
-            value: "SUV"
-        }
-    ]
+        { icon: <Users />, name: "Asientos", value: "5" },
+        { icon: <Settings />, name: "Transmisión", value: "Automatico" },
+        { icon: <Settings2 />, name: "Combustible", value: "Gasolina" },
+        { icon: <LayoutGrid />, name: "Tipo", value: "SUV" }
+    ];
 
     const { state } = useLocation();
+    const { id } = useParams();
     const navigate = useNavigate();
 
     const [days, setDays] = useState(1);
     const [date, setDate] = useState("");
 
-    if (!state) return <div>No hay datos</div>;
+    // 🔥 SOLUCIÓN: usar state o localStorage
+    const car = state || JSON.parse(localStorage.getItem("car"));
 
-    const total = state.price * days;
+    if (!car) return <div>No hay datos</div>;
+
+    const total = car.price * days;
 
     const handleReserve = () => {
-
         const user = JSON.parse(localStorage.getItem("user"));
 
-        // ❌ si no está logueado
         if (!user) {
             alert("Para continuar con la reserva necesitas iniciar sesión");
             return;
         }
 
-        // ❌ validar fecha
         if (!date) {
             alert("Selecciona una fecha para continuar");
             return;
         }
 
-        // ✅ 🔥 AGREGADO: guardar historial por usuario
         const newReservation = {
-            car: state,
+            car: car,
             days: days,
             total: total,
             date: date
@@ -70,7 +54,6 @@ export function DetailsCar() {
 
         localStorage.setItem(key, JSON.stringify(history));
 
-        // ✅ navegación (igual que ya tenías)
         navigate("/reservation", {
             state: newReservation
         });
@@ -80,20 +63,20 @@ export function DetailsCar() {
         <div className="flex flex-col">
 
             <div>
-                <img src={state.img} alt="" className="w-full" />
+                <img src={car.img} alt="" className="w-full" />
             </div>
 
             <Stepper step={1} />
 
             <div className="m-7.5 flex flex-col gap-3.75">
                 <span className="text-[#4B5563] text-[12px]">
-                    {state.brand} - {state.year}
+                    {car.brand} - {car.year}
                 </span>
                 <span className="font-bold text-[24px]">
-                    {state.name}
+                    {car.name}
                 </span>
                 <span className="text-[#497ACE] font-bold text-[24px]">
-                    S/. {state.price}{" "}
+                    S/. {car.price}{" "}
                     <span className="text-[#4B5563] font-normal text-[12px]">
                         x dia
                     </span>
@@ -131,49 +114,39 @@ export function DetailsCar() {
                                 type="button"
                                 value="-"
                                 onClick={() => setDays(days > 1 ? days - 1 : 1)}
-                                className="w-12 h-12 bg-white border border-[#B9B9B9] rounded-l-[10px] text-[#4B5563] text-center shadow-[5px_7px_5px_rgba(0,0,0,0.25)] cursor-pointer active:bg-gray-100"
+                                className="w-12 h-12 bg-white border border-[#B9B9B9] rounded-l-[10px] shadow-[0px_7px_0px_rgba(0,0,0,0.25)]"
                             />
 
                             <input
                                 type="text"
                                 value={days}
                                 readOnly
-                                className="w-12 h-12 border-y border-[#B9B9B9] border-x-0 text-center text-[#4B5563] bg-white shadow-[0px_7px_5px_rgba(0,0,0,0.25)] outline-none"
+                                className="w-12 h-12 border-y border-[#B9B9B9] text-center shadow-[0px_7px_0px_rgba(0,0,0,0.25)]"
                             />
 
                             <input
                                 type="button"
                                 value="+"
                                 onClick={() => setDays(days + 1)}
-                                className="w-12 h-12 bg-white border border-[#B9B9B9] rounded-r-[10px] text-[#4B5563] text-center shadow-[5px_7px_5px_rgba(0,0,0,0.25)] cursor-pointer active:bg-gray-100"
+                                className="w-12 h-12 bg-white border border-[#B9B9B9] rounded-r-[10px] shadow-[0px_7px_0px_rgba(0,0,0,0.25)]"
                             />
                         </div>
                     </div>
 
                     <div className="border-t-2 border-[#B9B9B9] p-7.5 grid grid-cols-2">
                         <span>Precio x día</span>
-                        <span className="text-end text-[#4B5563]">
-                            S/. {state.price}
-                        </span>
+                        <span className="text-end">S/. {car.price}</span>
 
                         <span className="pt-5.5">Precio Total</span>
-                        <span className="text-end text-[#4B5563] pt-5.5">
-                            S/. {total}
-                        </span>
+                        <span className="text-end pt-5.5">S/. {total}</span>
                     </div>
                 </form>
 
-                <button
-                    onClick={handleReserve}
-                    className="w-full bg-[#497ACE] shadow-[5px_7px_5px_rgba(0,0,0,0.28)] text-white text-[18px] font-semibold py-3 rounded-xl mt-4"
-                >
+                <button onClick={handleReserve} className="w-full bg-[#497ACE] text-white py-3 rounded-xl mt-4">
                     Reservar
                 </button>
 
-                <button
-                    onClick={() => navigate(-1)}
-                    className="w-full bg-white text-black py-3 rounded-xl border border-gray-300 mt-3 hover:bg-gray-100 transition shadow-[5px_7px_5px_rgba(0,0,0,0.28)] text-[18px] font-semibold"
-                >
+                <button onClick={() => navigate(-1)} className="w-full bg-white py-3 rounded-xl border mt-3">
                     Volver
                 </button>
             </div>

@@ -106,6 +106,7 @@ export function HomeDetails({ order, search }) { // ✅
             {sortedCars.map((car) => (
                 <HomeCar
                     key={car.id}
+                    id={car.id}
                     name={car.name}
                     price={car.price}
                     year={car.year}

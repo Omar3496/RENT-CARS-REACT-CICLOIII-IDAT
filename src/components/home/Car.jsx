@@ -1,12 +1,15 @@
 import { useNavigate } from "react-router-dom";
 
-export function HomeCar({ name, price, year, brand, img }) {
+export function HomeCar({ id, name, price, year, brand, img }) {
   const navigate = useNavigate();
 
   const handleDetailsClick = () => {
-    navigate("/details", {
-      state: { name, price, year, brand, img }
-    });
+    const car = { id, name, price, year, brand, img };
+
+    // 🔥 guardar para evitar pérdida en simulador / refresh
+    localStorage.setItem("car", JSON.stringify(car));
+
+    navigate(`/details/${id}`);
   };
 
   return (
