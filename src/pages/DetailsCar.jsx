@@ -20,8 +20,8 @@ export function DetailsCar() {
     const [days, setDays] = useState(1);
     const [date, setDate] = useState("");
 
-    // 🔥 SOLUCIÓN: usar state o localStorage
-    const car = state || JSON.parse(localStorage.getItem("car"));
+    // 🔥 SOLUCIÓN SEGURA
+    const car = state?.car || JSON.parse(localStorage.getItem("car"));
 
     if (!car) return <div>No hay datos</div>;
 
@@ -41,17 +41,21 @@ export function DetailsCar() {
         }
 
         const newReservation = {
-            car: car,
-            days: days,
-            total: total,
-            date: date
+            car,
+            days,
+            total,
+            date
         };
 
+        console.log("STATE ANTES DE NAVEGAR:", newReservation);
+
+        // 🔥 IMPORTANTE: guardar reserva global (esto arregla Reservation.jsx)
+        localStorage.setItem("reservation", JSON.stringify(newReservation));
+
+        // 🔥 historial del usuario (lo mantienes igual)
         const key = `history_${user.email}`;
         const history = JSON.parse(localStorage.getItem(key)) || [];
-
         history.push(newReservation);
-
         localStorage.setItem(key, JSON.stringify(history));
 
         navigate("/reservation", {
@@ -72,9 +76,11 @@ export function DetailsCar() {
                 <span className="text-[#4B5563] text-[12px]">
                     {car.brand} - {car.year}
                 </span>
+
                 <span className="font-bold text-[24px]">
                     {car.name}
                 </span>
+
                 <span className="text-[#497ACE] font-bold text-[24px]">
                     S/. {car.price}{" "}
                     <span className="text-[#4B5563] font-normal text-[12px]">
@@ -99,6 +105,7 @@ export function DetailsCar() {
 
                 <form className="bg-[#F6F9FE] rounded-[10px] mt-4">
                     <div className="p-7.5">
+
                         <label>Fecha</label>
 
                         <input
@@ -108,8 +115,12 @@ export function DetailsCar() {
                             className="w-full border border-[#B9B9B9] text-[#4B5563] rounded-[10px] p-2.5 mt-1.25 mb-7.5 shadow-[5px_7px_5px_rgba(0,0,0,0.28)]"
                         />
 
-                        <label className="block mb-2">Cantidad de Días</label>
+                        <label className="block mb-2">
+                            Cantidad de Días
+                        </label>
+
                         <div className="flex items-center">
+
                             <input
                                 type="button"
                                 value="-"
@@ -130,7 +141,9 @@ export function DetailsCar() {
                                 onClick={() => setDays(days + 1)}
                                 className="w-12 h-12 bg-white border border-[#B9B9B9] rounded-r-[10px] shadow-[0px_7px_0px_rgba(0,0,0,0.25)]"
                             />
+
                         </div>
+
                     </div>
 
                     <div className="border-t-2 border-[#B9B9B9] p-7.5 grid grid-cols-2">
@@ -142,13 +155,20 @@ export function DetailsCar() {
                     </div>
                 </form>
 
-                <button onClick={handleReserve} className="w-full bg-[#497ACE] text-white py-3 rounded-xl mt-4">
+                <button
+                    onClick={handleReserve}
+                    className="w-full bg-[#497ACE] text-white py-3 rounded-xl mt-4"
+                >
                     Reservar
                 </button>
 
-                <button onClick={() => navigate(-1)} className="w-full bg-white py-3 rounded-xl border mt-3">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="w-full bg-white py-3 rounded-xl border mt-3"
+                >
                     Volver
                 </button>
+
             </div>
         </div>
     );
