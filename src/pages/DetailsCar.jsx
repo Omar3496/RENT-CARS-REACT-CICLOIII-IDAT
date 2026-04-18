@@ -25,7 +25,7 @@ export function DetailsCar() {
 
     if (!car) return <div>No hay datos</div>;
 
-    const total = car.price * days;
+    const total = Number(car.price) * days;
 
     const handleReserve = () => {
         const user = JSON.parse(localStorage.getItem("user"));
@@ -81,10 +81,10 @@ export function DetailsCar() {
                     {car.name}
                 </span>
 
-                <span className="text-[#497ACE] font-bold text-[24px]">
+                <span translate="no" className="text-[#497ACE] font-bold text-[24px]">
                     S/. {car.price}{" "}
                     <span className="text-[#4B5563] font-normal text-[12px]">
-                        x dia
+                        x día
                     </span>
                 </span>
             </div>
